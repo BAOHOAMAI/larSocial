@@ -70,7 +70,7 @@
                     :class="[
                     post.current_user_reaction ?
                      'bg-sky-100 dark:bg-sky-900 hover:bg-sky-200 dark:hover:bg-sky-950' :
-                     'bg-gray-100 dark:bg-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 '
+                     'bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-800 '
                 ]"
                 >
                     <HandThumbUpIcon class="w-5 h-5"/>

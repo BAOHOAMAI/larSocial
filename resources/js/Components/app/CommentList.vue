@@ -24,6 +24,7 @@ function resetModal () {
     editingComment.value = null;
 
 }
+
 function createComment () {
     axiosClient.post(route('post.comment.create', props.post), {
             comment: newCommentText.value,
