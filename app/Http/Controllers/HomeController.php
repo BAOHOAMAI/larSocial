@@ -21,9 +21,12 @@ class HomeController extends Controller
             ->withCount('reactions')
             ->withCount('comments') 
             ->with(['comments' => function($query) {
-                $query->latest()
+                $query->whereNull('parent_id')
+                    ->latest()
                     ->take(5)
-                    ->withCount('reactions'); 
+                    ->withCount('reactions')
+                    ->withCount('comments') 
+             ; 
             }])
             ->latest()
             ->paginate(20);
@@ -33,5 +36,4 @@ class HomeController extends Controller
             'posts' => PostResource::collection($posts)
         ]);
     }
-    
 }

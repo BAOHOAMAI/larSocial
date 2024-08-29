@@ -16,7 +16,11 @@ const editingComment = ref(null);
 
 const props = defineProps({
     post: Object,
-   
+    data : Object,
+    parentComment : {
+        type : Object , 
+        default : null, 
+    }
 })
 
 function resetModal () {
@@ -28,12 +32,15 @@ function resetModal () {
 function createComment () {
     axiosClient.post(route('post.comment.create', props.post), {
             comment: newCommentText.value,
+            parent_id : props.parentComment ? props.parentComment.id : null
         })  
         .then(({data}) => {
-            resetModal()
-            props.post.comments.unshift(data)
+            props.data.comments.unshift(data)
+            if (props.parentComment) {
+                props.parentComment.nums_of_comment++;
+            }
             props.post.nums_of_comment++;
-        
+            resetModal()
         })
 }
 
@@ -53,7 +60,11 @@ function updateComment () {
 function deleteComment (comment) {
     axiosClient.delete(route('comment.delete', { comment: comment.id }))
         .then(({data}) => {
-            props.post.comments = props.post.comments.filter(c =>  c.id !== comment.id)
+            const index = props.data.comments.findIndex(c => c.id === comment.id);
+            props.post.comments.splice(index, 1);
+            if (props.parentComment) {
+                props.parentComment.nums_of_comment--;
+            }
             props.post.nums_of_comment--;
             resetModal()
         })
@@ -86,7 +97,7 @@ function sendCommentReaction (comment) {
         </div>
     </div>
     <div>
-        <div v-for="comment of props.post.comments" :key="comment.id" class="mb-4">
+        <div v-for="comment of data.comments" :key="comment.id" class="mb-4">
             <div class="flex justify-between gap-2">
                 <div class="flex gap-2">
                     <a href="javascript:void(0)">
@@ -137,16 +148,14 @@ function sendCommentReaction (comment) {
                         <DisclosureButton
                             class="flex items-center text-xs text-indigo-500 py-0.5 px-1 hover:bg-indigo-100 rounded-lg">
                             <ChatBubbleLeftEllipsisIcon class="w-3 h-3 mr-1"/>
-                            <span class="mr-2">{{ comment.num_of_comments }}</span>
+                            <span class="mr-2">{{ comment.nums_of_comment }}</span>
                             comments
                         </DisclosureButton>
                     </div>
                     <DisclosurePanel class="mt-3">
                         <CommentList :post="post"
                                      :data="{comments: comment.comments}"
-                                     :parent-comment="comment"
-                                     @comment-create="onCommentCreate"
-                                     @comment-delete="onCommentDelete"/>
+                                     :parentComment="comment"/>
                     </DisclosurePanel>
                 </Disclosure>
             </div>

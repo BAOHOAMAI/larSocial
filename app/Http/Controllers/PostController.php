@@ -152,6 +152,7 @@ class PostController extends Controller
     public function postComment (Request $request, Post $post) {
         $data = $request->validate([
             'comment' => ['required'],
+            'parent_id' => ['nullable' ,'exists:comments,id' ]
         ]);
        
         $userId = Auth::id();
@@ -161,6 +162,7 @@ class PostController extends Controller
             'user_id' => $userId,
             'post_id' => $postId,
             'comment' => nl2br($data['comment']) ,
+            'parent_id' => $data['parent_id'] ?? null,
         ]);
         
         return response(new CommentResource($comment), 201);

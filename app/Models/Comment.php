@@ -12,7 +12,7 @@ class Comment extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['user_id','post_id','comment'];
+    protected $fillable = ['user_id','post_id','comment','parent_id'];
 
     function user () {
         return $this->belongsTo(User::class);
@@ -24,5 +24,8 @@ class Comment extends Model
     {
         return $this->morphMany(Reaction::class, 'object');
     }
-    
+    public function comments()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
 }

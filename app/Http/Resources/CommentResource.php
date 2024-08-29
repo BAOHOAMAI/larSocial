@@ -18,6 +18,7 @@ class CommentResource extends JsonResource
         return [
             'id' => $this->id,
             'comment' => $this->comment,
+            "comments" => CommentResource::collection($this->comments),
             "created_at" => $this->created_at->format('Y-m-d H:i:s'),
             "updated_at" => $this->updated_at->format('Y-m-d H:i:s'),
             "nums_of_reaction" => $this->reactions_count, // Aggregating Related Models sử dụng withCount
