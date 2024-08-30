@@ -24,9 +24,25 @@ class PostResource extends JsonResource
             "created_at" => $this->created_at->format('Y-m-d H:i:s'),
             "updated_at" => $this->updated_at->format('Y-m-d H:i:s'),
             "nums_of_reaction" => $this->reactions_count, // Aggregating Related Models sử dụng withCount
-            "nums_of_comment" => $this->comments_count,
+            "nums_of_comment" => count($this->comments),
             "current_user_reaction" => $this->reactions->count() > 0,
-            "comments" => CommentResource::collection($this->comments),
+            "comments" => self::convertCommentsIntoTree($this->comments),
         ];
+    }
+    private static function convertCommentsIntoTree($comments, $parentId = null): array
+    {
+        $commentTree = [];
+
+        foreach ($comments as $comment) {
+            if ($comment->parent_id === $parentId) {
+                $children = self::convertCommentsIntoTree($comments, $comment->id);
+                $comment->childComments = $children;
+                $comment->numOfComments = collect($children)->sum('numOfComments') + count($children);
+
+                $commentTree[] = new CommentResource($comment);
+            }
+        }
+
+        return $commentTree;
     }
 }

@@ -13,7 +13,9 @@
     const props = defineProps ({
         post : Object, 
     })
+    
     const emit = defineEmits(['editClick' , 'openAttachment']);
+
     function openEditModal() {
         emit('editClick' , props.post);
     }

@@ -28,6 +28,21 @@ function resetModal () {
     editingComment.value = null;
 
 }
+const emit = defineEmits(['commentCreate', 'commentDelete']);
+
+function onCommentCreate(comment) {
+    if (props.parentComment) {
+        props.parentComment.num_of_comments++;
+    }
+    emit('commentCreate', comment)
+}
+
+function onCommentDelete(comment) {
+    if (props.parentComment) {
+        props.parentComment.num_of_comments--;
+    }
+    emit('commentDelete', comment)
+}
 
 function createComment () {
     axiosClient.post(route('post.comment.create', props.post), {
@@ -59,9 +74,9 @@ function updateComment () {
 
 function deleteComment (comment) {
     axiosClient.delete(route('comment.delete', { comment: comment.id }))
-        .then(({data}) => {
+        .then(( { data } )  => {
             const index = props.data.comments.findIndex(c => c.id === comment.id);
-            props.post.comments.splice(index, 1);
+            props.data.comments.splice(index, 1);
             if (props.parentComment) {
                 props.parentComment.nums_of_comment--;
             }
@@ -79,6 +94,7 @@ function sendCommentReaction (comment) {
             comment.nums_of_reaction = data.num_of_reactions;
         })
 }
+
 </script>
 
 <template>
@@ -155,7 +171,9 @@ function sendCommentReaction (comment) {
                     <DisclosurePanel class="mt-3">
                         <CommentList :post="post"
                                      :data="{comments: comment.comments}"
-                                     :parentComment="comment"/>
+                                     :parentComment="comment"
+                                     @comment-create="onCommentCreate"
+                                     @comment-delete="onCommentDelete"/>
                     </DisclosurePanel>
                 </Disclosure>
             </div>

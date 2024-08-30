@@ -37,7 +37,6 @@ const showExtensionsText = computed(() => {
         const file = myFile.file
         let parts = file.name.split('.')
         let ext = parts.pop().toLowerCase()
-        console.log(ext)
         if (!extensions.includes(ext)) {
             return true
         }
