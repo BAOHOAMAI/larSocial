@@ -17,17 +17,12 @@ const editingComment = ref(null);
 const props = defineProps({
     post: Object,
     data : Object,
-    parentComment : {
-        type : Object , 
-        default : null, 
+    parentComment: {
+        type: [Object, null],
+        default: null
     }
 })
 
-function resetModal () {
-    newCommentText.value = '';
-    editingComment.value = null;
-
-}
 const emit = defineEmits(['commentCreate', 'commentDelete']);
 
 function onCommentCreate(comment) {
@@ -44,18 +39,19 @@ function onCommentDelete(comment) {
     emit('commentDelete', comment)
 }
 
-function createComment () {
+function createComment() {
     axiosClient.post(route('post.comment.create', props.post), {
-            comment: newCommentText.value,
-            parent_id : props.parentComment ? props.parentComment.id : null
-        })  
+        comment: newCommentText.value,
+        parent_id: props.parentComment?.id || null
+    })
         .then(({data}) => {
+            newCommentText.value = ''
             props.data.comments.unshift(data)
             if (props.parentComment) {
                 props.parentComment.nums_of_comment++;
             }
             props.post.nums_of_comment++;
-            resetModal()
+            emit('commentCreate', data)
         })
 }
 
@@ -68,7 +64,7 @@ function updateComment () {
             comment: editingComment.value.comment,
         })  
         .then(({data}) => {
-            resetModal()
+            editingComment.value = null        
         })
 }
 
@@ -127,7 +123,7 @@ function sendCommentReaction (comment) {
                             </a>
                         </h4>
                         <small class="text-xs text-gray-400">{{ comment.updated_at }}</small>
-                    </div>
+                    </div>  
                 </div>
                 <EditDeleteDropdown :user="comment.user"
                                     :post="post"
@@ -171,16 +167,16 @@ function sendCommentReaction (comment) {
                     <DisclosurePanel class="mt-3">
                         <CommentList :post="post"
                                      :data="{comments: comment.comments}"
-                                     :parentComment="comment"
+                                     :parent-comment="comment"
                                      @comment-create="onCommentCreate"
                                      @comment-delete="onCommentDelete"/>
                     </DisclosurePanel>
                 </Disclosure>
             </div>
         </div>
-        <!-- <div v-if="!data.comments.length" class="py-4 text-center dark:text-gray-100">
+        <div v-if="!data.comments.length" class="py-4 text-center dark:text-gray-100">
             There are no comments.
-        </div> -->
+        </div>
     </div>
 </template>
 

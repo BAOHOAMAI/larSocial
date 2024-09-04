@@ -162,7 +162,7 @@ class PostController extends Controller
             'user_id' => $userId,
             'post_id' => $postId,
             'comment' => nl2br($data['comment']) ,
-            'parent_id' => $data['parent_id'] ?? null,
+            'parent_id' => $data['parent_id'] ?: null,
         ]);
         
         return response(new CommentResource($comment), 201);

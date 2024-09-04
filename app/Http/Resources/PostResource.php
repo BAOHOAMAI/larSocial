@@ -29,20 +29,23 @@ class PostResource extends JsonResource
             "comments" => self::convertCommentsIntoTree($this->comments),
         ];
     }
+
     private static function convertCommentsIntoTree($comments, $parentId = null): array
     {
         $commentTree = [];
 
         foreach ($comments as $comment) {
             if ($comment->parent_id === $parentId) {
+
                 $children = self::convertCommentsIntoTree($comments, $comment->id);
                 $comment->childComments = $children;
                 $comment->numOfComments = collect($children)->sum('numOfComments') + count($children);
-
                 $commentTree[] = new CommentResource($comment);
+                
             }
         }
 
         return $commentTree;
     }
+    
 }
